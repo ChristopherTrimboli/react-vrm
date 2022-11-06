@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     mode: 'development',
@@ -42,6 +43,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             inject: true,
             template: path.join(__dirname, "index.html"),
+        }),
+        new CopyPlugin({
+            patterns: [
+                { from: "vrms/", to: "vrms/" },
+            ],
         }),
     ],
 };
