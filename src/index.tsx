@@ -1,9 +1,9 @@
 import { createRoot } from 'react-dom/client'
 import React from 'react'
 import { Canvas } from '@react-three/fiber'
-import VRM from './VRM';
 import OrbitCamera from './OrbitCamera';
 import Floor from './Floor';
+import Multiplayer from './Multiplayer';
 
 const root = document.getElementById('root');
 if (root) (
@@ -11,7 +11,7 @@ if (root) (
     <Canvas>
       <Floor />
       <OrbitCamera />
-      <VRM url="vrms/setuna.vrm" />
+      <Multiplayer />
     </Canvas>,
   )
 )

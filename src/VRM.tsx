@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, Suspense } from "react";
 import { useLoader } from "@react-three/fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { cloneGltf } from "./helpers";
 
 const getBone = (gltf: any, boneName: string) => {
     const gltfNodes = gltf.parser.json.nodes;
@@ -12,13 +13,42 @@ const getBone = (gltf: any, boneName: string) => {
 
 interface VRMProps {
     url: string;
+    position?: [number, number, number];
+    updatePosition?: (position: [number, number, number]) => void;
+    isClientUser?: boolean;
 }
 
-const VRM = ({ url }: VRMProps) => {
+const VRM = ({ url, position, updatePosition, isClientUser }: VRMProps) => {
     const [gltfState, setGltfState] = useState<any>(null);
     const [isLoaded, setIsLoaded] = useState(false);
 
     const gltf = useMemo(() => useLoader(GLTFLoader, url), [url]);
+
+    useEffect(() => {
+        const gltfSceneClone = cloneGltf(gltf)
+        setGltfState(gltfSceneClone);
+    }, [gltf]);
+
+    useEffect(() => {
+        gltfState?.scene && setIsLoaded(true);
+    }, [gltfState]);
+
+    useEffect(() => {
+        if (position && gltfState) {
+            const [x, y, z] = position;
+            let newGltf = gltfState;
+            if (x !== null && x !== undefined && x !== newGltf.scene.position.x) {
+                newGltf.scene.position.setX(x);
+            }
+            if (y !== null && y !== undefined && y !== newGltf.scene.position.y) {
+                newGltf.scene.position.setY(y);
+            }
+            if (z !== null && z !== undefined && z !== newGltf.scene.position.z) {
+                newGltf.scene.position.setZ(z);
+            }
+            setGltfState(newGltf);
+        }
+    }, [position, gltfState])
 
     const rotateBone = (boneName: string, rotation: [number, number, number]) => {
         const [x, y, z] = rotation;
@@ -30,33 +60,46 @@ const VRM = ({ url }: VRMProps) => {
         setGltfState(newGltf);
     }
 
-    useEffect(() => {
-        console.log(gltf);
-        setGltfState(gltf);
-    }, [gltf]);
+    const movePosition = (position: [number, number, number]) => {
+        const [x, y, z] = position;
+        let newGltf = gltfState;
+        newGltf.scene.position.set(
+            newGltf.scene.position.x + x,
+            newGltf.scene.position.y + y,
+            newGltf.scene.position.z + z
+        );
+        setGltfState(newGltf);
+        updatePosition && updatePosition([newGltf.scene.position.x, newGltf.scene.position.y, newGltf.scene.position.z]);
+    }
 
     useEffect(() => {
-        gltfState?.scene && setIsLoaded(true);
-    }, [gltfState]);
-
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.key === "a") {
-                rotateBone("leftUpperArm", [0.5, 0.5, 0.5]);
+        if (isClientUser) {
+            const handleKeyPress = (event: KeyboardEvent) => {
+                switch (event.key) {
+                    case "w": {
+                        movePosition([0, 0, -0.1]);
+                        break;
+                    }
+                    case "a": {
+                        movePosition([-0.1, 0, 0]);
+                        break;
+                    }
+                    case "s": {
+                        movePosition([0, 0, 0.1]);
+                        break;
+                    }
+                    case "d": {
+                        movePosition([0.1, 0, 0]);
+                        break;
+                    }
+                    default:
+                        break;
+                }
             }
-            if (event.key === "d") {
-                rotateBone("rightUpperArm", [0.5, 0.5, 0.5]);
-            }
-            if (event.key === "w") {
-                rotateBone("rightUpperLeg", [0.5, 0.5, 0.5]);
-            }
-            if (event.key === "s") {
-                rotateBone("leftUpperLeg", [0.5, 0.5, 0.5]);
-            }
+            window.addEventListener('keypress', handleKeyPress);
+            return () => window.removeEventListener('keypress', handleKeyPress);
         }
-        window.addEventListener('keypress', handleKeyPress);
-        return () => window.removeEventListener('keypress', handleKeyPress);
-    }, [rotateBone]);
+    }, [movePosition]);
 
     return (
         <Suspense fallback={null}>
