@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/ChristopherTrimboli/react-vrm/issues"
   },
-  "homepage": "https://github.com/ChristopherTrimboli/react-vrm#readme",
+  "homepage": "https://github.com/ChristopherTrimboli/react-vrm",
   "dependencies": {
     "@react-three/fiber": "^8.9.1",
     "three": "^0.146.0"
