@@ -11,7 +11,7 @@ if (root) (
     <Canvas>
       <Floor />
       <OrbitCamera />
-      <VRM url="../vrms/setuna.vrm" />
+      <VRM url="vrms/setuna.vrm" />
     </Canvas>,
   )
 )
