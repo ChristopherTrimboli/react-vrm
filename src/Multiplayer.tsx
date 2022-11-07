@@ -10,7 +10,7 @@ const Multiplayer = () => {
     useEffect(() => {
         if (!ws) {
             // ws://localhost:80
-            const webSocket = new WebSocket("ws://react-vrm.herokuapp.com/");
+            const webSocket = new WebSocket("wss://react-vrm.herokuapp.com/");
             setWs(webSocket);
         }
     }, [ws]);
