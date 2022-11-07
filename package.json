@@ -4,8 +4,8 @@
   "description": "react-three-fiber VRM implementation",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "webpack serve --open",
-    "build": "webpack",
+    "dev": "webpack serve --open --config webpack.config.dev.js",
+    "build": "webpack --config webpack.config.prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
