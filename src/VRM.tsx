@@ -69,7 +69,7 @@ const VRM = ({ url, position, updatePosition, isClientUser }: VRMProps) => {
     }
 
     useEffect(() => {
-        if (position && (position[0] !== internalPosition[0] || position[1] !== internalPosition[1] || position[2] !== internalPosition[2])) {
+        if (!isClientUser && position && (position[0] !== internalPosition[0] || position[1] !== internalPosition[1] || position[2] !== internalPosition[2])) {
             setInternalPosition(position);
         }
     }, [position])
