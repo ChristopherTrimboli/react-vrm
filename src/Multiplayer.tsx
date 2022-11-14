@@ -10,6 +10,7 @@ const Multiplayer = () => {
     useEffect(() => {
         if (!ws) {
             // ws://localhost:80
+            // wss://react-vrm.herokuapp.com/
             const webSocket = new WebSocket("wss://react-vrm.herokuapp.com/");
             setWs(webSocket);
         }
@@ -58,7 +59,7 @@ const Multiplayer = () => {
                 return <VRM
                     url="vrms/setuna.vrm"
                     key={userId}
-                    position={clientUserId !== userId ? [info.x, info.y, info.z] : [null, null, null]}
+                    position={[info.x, info.y, info.z]}
                     updatePosition={handleUpdatePosition}
                     isClientUser={userId === clientUserId}
                 />
