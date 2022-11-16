@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import React from 'react'
 import { Canvas } from '@react-three/fiber'
-import OrbitCamera from './OrbitCamera';
 import Floor from './Floor';
 import Multiplayer from './Multiplayer';
 
@@ -10,7 +9,6 @@ if (root) (
   createRoot(root).render(
     <Canvas>
       <Floor />
-      <OrbitCamera />
       <Multiplayer />
     </Canvas>,
   )

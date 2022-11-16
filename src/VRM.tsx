@@ -1,17 +1,10 @@
 import React, { useEffect, useState, useMemo, Suspense, useRef } from "react";
-import { useLoader } from "@react-three/fiber"
+import { useFrame, useLoader } from "@react-three/fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { cloneGltf } from "./helpers";
 import { useSpring, animated } from "@react-spring/three";
 import { Object3D } from "three";
-
-// const getBone = (gltf: any, boneName: string) => {
-//     const gltfNodes = gltf.parser.json.nodes;
-//     const vrmExtension = gltf?.parser?.json?.extensions?.["VRM"] || gltf?.parser?.json?.extensions?.["VRMC_vrm"]
-//     const humanBones = vrmExtension.humanoid.humanBones;
-//     const bone = humanBones.find((humanBone: any) => humanBone.bone === boneName);
-//     return gltfNodes[bone.node];
-// }
+import { OrbitControls } from "@react-three/drei";
 
 type Position = [x: number, y: number, z: number];
 
@@ -26,6 +19,7 @@ const VRM = ({ url, position, updatePosition, isClientUser }: VRMProps) => {
     const [gltfState, setGltfState] = useState<any>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [internalPosition, setInternalPosition] = useState<Position>([0, 0, 0]);
+    const [cameraTarget, setCameraTarget] = useState<Position>([0, 0, 0]);
 
     const gltfRef = useRef<Object3D<Event>>(null);
 
@@ -49,15 +43,12 @@ const VRM = ({ url, position, updatePosition, isClientUser }: VRMProps) => {
         }
     }, [gltfState, gltfRef?.current]);
 
-    // const rotateBone = (boneName: string, rotation: [number, number, number]) => {
-    //     const [x, y, z] = rotation;
-    //     let newGltf = gltfState;
-    //     const bone = getBone(newGltf, boneName);
-    //     x && newGltf.nodes[bone.name].rotateX(x);
-    //     y && newGltf.nodes[bone.name].rotateY(y);
-    //     z && newGltf.nodes[bone.name].rotateZ(z);
-    //     setGltfState(newGltf);
-    // }
+    useFrame(() => {
+        if (gltfRef?.current) {
+            const { x, y, z } = gltfRef.current.position;
+            setCameraTarget([x, y + 0.75, z]);
+        }
+    })
 
     const movePosition = (position: Position) => {
         const [x, y, z] = position;
@@ -104,10 +95,33 @@ const VRM = ({ url, position, updatePosition, isClientUser }: VRMProps) => {
     }, [movePosition]);
 
     return (
-        <Suspense fallback={null}>
-            {isLoaded && <animated.object3D position={positionSpring.position} ref={gltfRef} />}
-        </Suspense>
+        <>
+            <Suspense fallback={null}>
+                {isLoaded && <>
+                    <animated.object3D position={positionSpring.position} ref={gltfRef} />
+                    {isClientUser && <OrbitControls maxDistance={4} minDistance={1.5} makeDefault target={cameraTarget} />}
+                </>}
+            </Suspense>
+        </>
     )
 }
 
 export default VRM;
+
+// const getBone = (gltf: any, boneName: string) => {
+//     const gltfNodes = gltf.parser.json.nodes;
+//     const vrmExtension = gltf?.parser?.json?.extensions?.["VRM"] || gltf?.parser?.json?.extensions?.["VRMC_vrm"]
+//     const humanBones = vrmExtension.humanoid.humanBones;
+//     const bone = humanBones.find((humanBone: any) => humanBone.bone === boneName);
+//     return gltfNodes[bone.node];
+// }
+
+// const rotateBone = (boneName: string, rotation: [number, number, number]) => {
+//     const [x, y, z] = rotation;
+//     let newGltf = gltfState;
+//     const bone = getBone(newGltf, boneName);
+//     x && newGltf.nodes[bone.name].rotateX(x);
+//     y && newGltf.nodes[bone.name].rotateY(y);
+//     z && newGltf.nodes[bone.name].rotateZ(z);
+//     setGltfState(newGltf);
+// }
