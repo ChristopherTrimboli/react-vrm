@@ -44,7 +44,7 @@ const VRM = ({ url, position, updatePosition, isClientUser }: VRMProps) => {
     }, [gltfState, gltfRef?.current]);
 
     useFrame(() => {
-        if (gltfRef?.current) {
+        if (gltfRef?.current && isClientUser) {
             const { x, y, z } = gltfRef.current.position;
             setCameraTarget([x, y + 0.75, z]);
         }
